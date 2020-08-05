@@ -1,7 +1,7 @@
-job("self_imagebuilder1"){
+job("imagebuilder"){
         description("this job will copy the file in you os version and push image to docker hub")
         scm {
-                 github('guptaadi123/dockerauto' , 'master')
+                 github('Rohan123/dockerauto' , 'master')
              }
         triggers {
                 scm("* * * * *")
@@ -13,18 +13,18 @@ job("self_imagebuilder1"){
         steps {
         shell('''sudo cp * /html/
 
-sudo docker build -t adity12/http:latest .
+sudo docker build -t rsshekhawat/webserver .
 
-sudo docker push adity12/http''')
+sudo docker push rsshekhawat/webserver''')
       }
 }
 
-job("self_pod_managment1"){
+job("pod_managment1"){
         description("this will creat deploymet for website and expose deployment")
         
         triggers {
         upstream {
-    upstreamProjects("self_imagebuilder1")
+    upstreamProjects("imagebuilder")
     threshold("Fail")
         }
         }
@@ -35,15 +35,15 @@ job("self_pod_managment1"){
 then
 echo " updating"
 else
-sudo kubectl create deployment myweb --image=adity12/http
+sudo kubectl create deployment myweb --image=rsshekhawat/webserver
 sudo kubectl autoscale deployment myweb --min=10 --max=15 --cpu-percent=80
 fi
 
 if sudo kubectl get deployment -o wide | grep latest
 then 
-sudo kubectl set image deployment myweb http=adity12/http
+sudo kubectl set image deployment myweb rsshekhawat/webserver
 else
-sudo kubectl set image deployment myweb http=adity12/http:latest
+sudo kubectl set image deployment myweb http=rsshekhawat/webserver
 fi
 
 
@@ -59,12 +59,12 @@ fi ''')
 }
 
 
-job("self_finaltesting1"){
+job("testing"){
         description("this job will test the env")
         
         triggers {
                 upstream {
-    upstreamProjects("self_pod_managment1")
+    upstreamProjects("pod_managment1")
     threshold("Fail")
    } 
         }
@@ -76,7 +76,7 @@ job("self_finaltesting1"){
 then
 echo " All good"
 else
-cd /aditya6547/
+cd /sagar123/
 python3 mail.py
 
 fi
